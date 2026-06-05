@@ -15,6 +15,24 @@ class Atribuicao:
         self.valor = valor
 
 
+class Bloco:
+    def __init__(self, comandos):
+        self.comandos = comandos
+
+
+class Se:
+    def __init__(self, condicao, bloco_se, bloco_senao=None):
+        self.condicao = condicao
+        self.bloco_se = bloco_se
+        self.bloco_senao = bloco_senao
+
+
+class Enquanto:
+    def __init__(self, condicao, bloco):
+        self.condicao = condicao
+        self.bloco = bloco
+
+
 class Numero:
     def __init__(self, valor):
         self.valor = valor
@@ -32,18 +50,13 @@ class Binario:
         self.direita = direita
 
 
-class Se:
-    def __init__(self, condicao, bloco):
-        self.condicao = condicao
-        self.bloco = bloco
+class Relacional:
+    def __init__(self, operador, esquerda, direita):
+        self.operador = operador
+        self.esquerda = esquerda
+        self.direita = direita
 
 
-class Enquanto:
-    def __init__(self, condicao, bloco):
-        self.condicao = condicao
-        self.bloco = bloco
-
-
-class Bloco:
-    def __init__(self, comandos):
-        self.comandos = comandos
+class Booleano:
+    def __init__(self, valor):
+        self.valor = valor

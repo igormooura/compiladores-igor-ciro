@@ -9,8 +9,10 @@ class Parser:
 
 
     def atual(self):
+
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
+
         return None
 
 
@@ -27,6 +29,7 @@ class Parser:
             )
 
         self.pos += 1
+
         return token
 
 
@@ -81,7 +84,7 @@ class Parser:
 
         self.consumir("ATRIBUI")
 
-        valor = self.expressao()
+        valor = self.expressao_relacional()
 
         self.consumir("PONTO_VIRGULA")
 
@@ -94,13 +97,26 @@ class Parser:
 
         self.consumir("ABRE_PAR")
 
-        condicao = self.expressao()
+        condicao = self.expressao_relacional()
 
         self.consumir("FECHA_PAR")
 
-        bloco = self.bloco()
+        bloco_se = self.bloco()
 
-        return Se(condicao, bloco)
+        bloco_senao = None
+
+        if (
+            self.atual() is not None
+            and self.atual().tipo == "SENAO"
+        ):
+            self.consumir("SENAO")
+            bloco_senao = self.bloco()
+
+        return Se(
+            condicao,
+            bloco_se,
+            bloco_senao
+        )
 
 
     def enquanto(self):
@@ -109,13 +125,16 @@ class Parser:
 
         self.consumir("ABRE_PAR")
 
-        condicao = self.expressao()
+        condicao = self.expressao_relacional()
 
         self.consumir("FECHA_PAR")
 
         bloco = self.bloco()
 
-        return Enquanto(condicao, bloco)
+        return Enquanto(
+            condicao,
+            bloco
+        )
 
 
     def bloco(self):
@@ -134,16 +153,51 @@ class Parser:
         return Bloco(comandos)
 
 
+    def expressao_relacional(self):
+
+        esquerda = self.expressao()
+
+        if (
+            self.atual() is not None
+            and self.atual().tipo in [
+                "MAIOR",
+                "MENOR",
+                "MAIOR_IGUAL",
+                "MENOR_IGUAL",
+                "IGUAL",
+                "DIFERENTE"
+            ]
+        ):
+
+            operador = self.atual().valor
+
+            self.pos += 1
+
+            direita = self.expressao()
+
+            return Relacional(
+                operador,
+                esquerda,
+                direita
+            )
+
+        return esquerda
+
+
     def expressao(self):
 
         esquerda = self.termo()
 
         while (
-            self.atual() is not None and
-            self.atual().tipo in ["SOMA", "SUBTRAI"]
+            self.atual() is not None
+            and self.atual().tipo in [
+                "SOMA",
+                "SUBTRAI"
+            ]
         ):
 
             operador = self.atual().valor
+
             self.pos += 1
 
             direita = self.termo()
@@ -162,8 +216,8 @@ class Parser:
         esquerda = self.fator()
 
         while (
-            self.atual() is not None and
-            self.atual().tipo in [
+            self.atual() is not None
+            and self.atual().tipo in [
                 "MULTIPLICA",
                 "DIVIDE",
                 "RESTO"
@@ -171,6 +225,7 @@ class Parser:
         ):
 
             operador = self.atual().valor
+
             self.pos += 1
 
             direita = self.fator()
@@ -192,6 +247,14 @@ class Parser:
             self.pos += 1
             return Numero(token.valor)
 
+        if token.tipo == "VERDADEIRO":
+            self.pos += 1
+            return Booleano(True)
+
+        if token.tipo == "FALSO":
+            self.pos += 1
+            return Booleano(False)
+
         if token.tipo == "ID":
             self.pos += 1
             return Variavel(token.valor)
@@ -200,7 +263,7 @@ class Parser:
 
             self.consumir("ABRE_PAR")
 
-            expr = self.expressao()
+            expr = self.expressao_relacional()
 
             self.consumir("FECHA_PAR")
 
