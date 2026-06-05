@@ -7,14 +7,12 @@ class Parser:
         self.tokens = tokens
         self.pos = 0
 
-
     def atual(self):
 
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
 
         return None
-
 
     def consumir(self, tipo):
 
@@ -32,7 +30,6 @@ class Parser:
 
         return token
 
-
     def programa(self):
 
         comandos = []
@@ -44,13 +41,24 @@ class Parser:
 
         return Programa(comandos)
 
-
     def comando(self):
 
         token = self.atual()
 
-        if token.tipo in ["INTEIRO", "RACIONAL", "LETRA"]:
+        if token.tipo in [
+            "INTEIRO",
+            "RACIONAL",
+            "LETRA",
+            "BOOLEANO",
+            "TEXTO"
+        ]:
             return self.declaracao()
+
+        if token.tipo == "FUNCAO":
+            return self.funcao()
+
+        if token.tipo == "RETORNE":
+            return self.retorne()
 
         if token.tipo == "ID":
             return self.atribuicao()
@@ -65,7 +73,6 @@ class Parser:
             f"Comando inválido: {token.tipo}"
         )
 
-
     def declaracao(self):
 
         tipo = self.atual().valor
@@ -77,19 +84,17 @@ class Parser:
 
         return Declaracao(tipo, nome)
 
-
     def atribuicao(self):
 
         nome = self.consumir("ID").valor
 
         self.consumir("ATRIBUI")
 
-        valor = self.expressao_relacional()
+        valor = self.expressao_logica()
 
         self.consumir("PONTO_VIRGULA")
 
         return Atribuicao(nome, valor)
-
 
     def se(self):
 
@@ -97,7 +102,7 @@ class Parser:
 
         self.consumir("ABRE_PAR")
 
-        condicao = self.expressao_relacional()
+        condicao = self.expressao_logica()
 
         self.consumir("FECHA_PAR")
 
@@ -118,14 +123,13 @@ class Parser:
             bloco_senao
         )
 
-
     def enquanto(self):
 
         self.consumir("ENQUANTO")
 
         self.consumir("ABRE_PAR")
 
-        condicao = self.expressao_relacional()
+        condicao = self.expressao_logica()
 
         self.consumir("FECHA_PAR")
 
@@ -136,6 +140,65 @@ class Parser:
             bloco
         )
 
+    def funcao(self):
+
+        self.consumir("FUNCAO")
+
+        tipo = self.atual().valor
+        self.pos += 1
+
+        nome = self.consumir("ID").valor
+
+        self.consumir("ABRE_PAR")
+
+        parametros = []
+
+        if self.atual().tipo != "FECHA_PAR":
+
+            parametros.append(
+                self.parametro()
+            )
+
+            while self.atual().tipo == "VIRGULA":
+
+                self.consumir("VIRGULA")
+
+                parametros.append(
+                    self.parametro()
+                )
+
+        self.consumir("FECHA_PAR")
+
+        bloco = self.bloco()
+
+        return Funcao(
+            tipo,
+            nome,
+            parametros,
+            bloco
+        )
+
+    def parametro(self):
+
+        tipo = self.atual().valor
+        self.pos += 1
+
+        nome = self.consumir("ID").valor
+
+        return Parametro(
+            tipo,
+            nome
+        )
+
+    def retorne(self):
+
+        self.consumir("RETORNE")
+
+        valor = self.expressao_logica()
+
+        self.consumir("PONTO_VIRGULA")
+
+        return Retorne(valor)
 
     def bloco(self):
 
@@ -152,6 +215,31 @@ class Parser:
 
         return Bloco(comandos)
 
+    def expressao_logica(self):
+
+        esquerda = self.expressao_relacional()
+
+        while (
+            self.atual() is not None
+            and self.atual().tipo in [
+                "E",
+                "OU"
+            ]
+        ):
+
+            operador = self.atual().valor
+
+            self.pos += 1
+
+            direita = self.expressao_relacional()
+
+            esquerda = Logico(
+                operador,
+                esquerda,
+                direita
+            )
+
+        return esquerda
 
     def expressao_relacional(self):
 
@@ -183,7 +271,6 @@ class Parser:
 
         return esquerda
 
-
     def expressao(self):
 
         esquerda = self.termo()
@@ -209,7 +296,6 @@ class Parser:
             )
 
         return esquerda
-
 
     def termo(self):
 
@@ -238,6 +324,34 @@ class Parser:
 
         return esquerda
 
+    def chamada_funcao(self):
+
+        nome = self.consumir("ID").valor
+
+        self.consumir("ABRE_PAR")
+
+        argumentos = []
+
+        if self.atual().tipo != "FECHA_PAR":
+
+            argumentos.append(
+                self.expressao_logica()
+            )
+
+            while self.atual().tipo == "VIRGULA":
+
+                self.consumir("VIRGULA")
+
+                argumentos.append(
+                    self.expressao_logica()
+                )
+
+        self.consumir("FECHA_PAR")
+
+        return ChamadaFuncao(
+            nome,
+            argumentos
+        )
 
     def fator(self):
 
@@ -247,6 +361,14 @@ class Parser:
             self.pos += 1
             return Numero(token.valor)
 
+        if token.tipo == "STRING_LITERAL":
+            self.pos += 1
+            return StringLiteral(token.valor)
+
+        if token.tipo == "CARACTERE_LITERAL":
+            self.pos += 1
+            return CaractereLiteral(token.valor)
+
         if token.tipo == "VERDADEIRO":
             self.pos += 1
             return Booleano(True)
@@ -255,15 +377,31 @@ class Parser:
             self.pos += 1
             return Booleano(False)
 
+        if token.tipo == "NAO":
+
+            self.consumir("NAO")
+
+            return Negacao(
+                self.fator()
+            )
+
         if token.tipo == "ID":
+
+            if (
+                self.pos + 1 < len(self.tokens)
+                and self.tokens[self.pos + 1].tipo == "ABRE_PAR"
+            ):
+                return self.chamada_funcao()
+
             self.pos += 1
+
             return Variavel(token.valor)
 
         if token.tipo == "ABRE_PAR":
 
             self.consumir("ABRE_PAR")
 
-            expr = self.expressao_relacional()
+            expr = self.expressao_logica()
 
             self.consumir("FECHA_PAR")
 

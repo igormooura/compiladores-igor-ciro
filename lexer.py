@@ -1,18 +1,25 @@
 import re
 
-
 TOKENS = [
+
     ("INTEIRO", r"\binteiro\b"),
     ("RACIONAL", r"\bracional\b"),
     ("LETRA", r"\bletra\b"),
+    ("BOOLEANO", r"\bbooleano\b"),
+    ("TEXTO", r"\btexto\b"),
 
     ("SE", r"\bse\b"),
     ("SENAO", r"\bsenao\b"),
     ("ENQUANTO", r"\benquanto\b"),
 
+    ("FUNCAO", r"\bfuncao\b"),
+    ("RETORNE", r"\bretorne\b"),
+
     ("VERDADEIRO", r"\bverdadeiro\b"),
     ("FALSO", r"\bfalso\b"),
 
+    ("STRING_LITERAL", r'"[^"]*"'),
+    ("CARACTERE_LITERAL", r"'[^']'"),
     ("NUMERO", r"\d+(\.\d+)?"),
 
     ("ID", r"[a-zA-Z_][a-zA-Z0-9_]*"),
@@ -21,6 +28,10 @@ TOKENS = [
     ("DIFERENTE", r"!="),
     ("MAIOR_IGUAL", r">="),
     ("MENOR_IGUAL", r"<="),
+
+    ("E", r"&&"),
+    ("OU", r"\|\|"),
+    ("NAO", r"!"),
 
     ("MAIOR", r">"),
     ("MENOR", r"<"),
@@ -67,7 +78,6 @@ PADRAO = "|".join(
 def analisar_lexicamente(codigo):
 
     tokens = []
-
     pos = 0
 
     for match in re.finditer(PADRAO, codigo):

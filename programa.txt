@@ -1,0 +1,15 @@
+inteiro idade;
+
+idade = 10 + 20;
+
+se (idade > 15) {
+    idade = idade + 1;
+} se (idade == 10){
+    idade = idade + 3;
+} senao { 
+    idade = idade - 2;
+}
+
+enquanto (idade < 25) {
+    idade = idade + 1;
+}

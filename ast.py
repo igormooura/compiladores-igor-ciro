@@ -60,3 +60,43 @@ class Relacional:
 class Booleano:
     def __init__(self, valor):
         self.valor = valor
+
+class StringLiteral:
+    def __init__(self, valor):
+        self.valor = valor
+
+
+class CaractereLiteral:
+    def __init__(self, valor):
+        self.valor = valor
+
+
+class Funcao:
+    def __init__(
+        self,
+        tipo_retorno,
+        nome,
+        parametros,
+        bloco
+    ):
+        self.tipo_retorno = tipo_retorno
+        self.nome = nome
+        self.parametros = parametros
+        self.bloco = bloco
+
+
+class Parametro:
+    def __init__(self, tipo, nome):
+        self.tipo = tipo
+        self.nome = nome
+
+
+class Retorne:
+    def __init__(self, valor):
+        self.valor = valor
+
+
+class ChamadaFuncao:
+    def __init__(self, nome, argumentos):
+        self.nome = nome
+        self.argumentos = argumentos
