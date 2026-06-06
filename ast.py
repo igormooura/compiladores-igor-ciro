@@ -109,6 +109,18 @@ class ChamadaFuncao:
         self.argumentos = argumentos
 
 
+class Logico:
+    def __init__(self, operador, esquerda, direita):
+        self.operador = operador
+        self.esquerda = esquerda
+        self.direita = direita
+
+
+class Negacao:
+    def __init__(self, expressao):
+        self.expressao = expressao
+
+
 class DoEnquanto:
     def __init__(self, bloco, condicao):
         self.bloco = bloco

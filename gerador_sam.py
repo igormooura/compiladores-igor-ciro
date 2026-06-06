@@ -218,6 +218,8 @@ class GeradorSaM:
 
         self.visitar(no.condicao)
 
+        # JUMPC na SaM salta quando o topo é verdadeiro; inverter condição para pular quando for falso
+        self.codigo.append("NOT")
         self.codigo.append(
             f"JUMPC {rotulo_senao}"
         )
@@ -251,6 +253,8 @@ class GeradorSaM:
 
         self.visitar(no.condicao)
 
+        # inverter para JUMPC (salta quando verdadeiro)
+        self.codigo.append("NOT")
         self.codigo.append(
             f"JUMPC {fim}"
         )
@@ -276,6 +280,8 @@ class GeradorSaM:
 
         # depois avalia condição
         self.visitar(no.condicao)
+        # inverter para JUMPC
+        self.codigo.append("NOT")
         self.codigo.append(f"JUMPC {fim}")
         self.codigo.append(f"JUMP {inicio}")
         self.codigo.append(f"{fim}:")
