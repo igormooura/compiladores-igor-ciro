@@ -16,7 +16,18 @@ class GeradorSaM:
 
     def gerar(self, arvore):
 
-        self.visitar(arvore)
+        # coletar funções para inline
+        self.funcoes = {}
+        comandos = []
+        for comando in arvore.comandos:
+            if isinstance(comando, Funcao):
+                self.funcoes[comando.nome] = comando
+            else:
+                comandos.append(comando)
+
+        # visitar apenas comandos não-função (funções serão inlined quando chamadas)
+        for comando in comandos:
+            self.visitar(comando)
 
         self.codigo.append("STOP")
 
@@ -55,20 +66,42 @@ class GeradorSaM:
 
         self.variaveis[no.nome] = self.proximo_offset
 
-        self.proximo_offset += 1
-
-        self.codigo.append("PUSHIMM 0")
+        if no.tamanho is None:
+            # variável simples
+            self.proximo_offset += 1
+            self.codigo.append("PUSHIMM 0")
+        else:
+            # vetor: aloca várias posições
+            tamanho = int(no.tamanho)
+            for _ in range(tamanho):
+                self.codigo.append("PUSHIMM 0")
+            self.proximo_offset += tamanho
 
 
     def visitar_Atribuicao(self, no):
 
-        self.visitar(no.valor)
+        # destino pode ser nome (str) ou AcessoVetor
+        if isinstance(no.nome, AcessoVetor):
+            # acesso a vetor - índice deve ser número literal para geração simples
+            if not isinstance(no.nome.indice, Numero):
+                raise Exception('Geração para acesso a vetor só suporta índice constante')
+            base = self.variaveis[no.nome.nome]
+            indice = int(no.nome.indice.valor)
+            offset = base + indice
 
-        offset = self.variaveis[no.nome]
+            self.visitar(no.valor)
 
-        self.codigo.append(
-            f"STOREOFF {offset}"
-        )
+            self.codigo.append(
+                f"STOREOFF {offset}"
+            )
+        else:
+            self.visitar(no.valor)
+
+            offset = self.variaveis[no.nome]
+
+            self.codigo.append(
+                f"STOREOFF {offset}"
+            )
 
 
     def visitar_Numero(self, no):
@@ -94,6 +127,18 @@ class GeradorSaM:
         self.codigo.append(
             f"PUSHOFF {offset}"
         )
+
+    def visitar_AcessoVetor(self, no):
+
+        # suporte simples: índice constante
+        if not isinstance(no.indice, Numero):
+            raise Exception('Geração para acesso a vetor só suporta índice constante')
+
+        base = self.variaveis[no.nome]
+        indice = int(no.indice.valor)
+        offset = base + indice
+
+        self.codigo.append(f"PUSHOFF {offset}")
 
 
     def visitar_Binario(self, no):
@@ -219,3 +264,60 @@ class GeradorSaM:
         self.codigo.append(
             f"{fim}:"
         )
+
+    def visitar_DoEnquanto(self, no):
+
+        inicio = self.novo_rotulo()
+        fim = self.novo_rotulo()
+
+        # bloco executa primeiro
+        self.codigo.append(f"{inicio}:")
+        self.visitar(no.bloco)
+
+        # depois avalia condição
+        self.visitar(no.condicao)
+        self.codigo.append(f"JUMPC {fim}")
+        self.codigo.append(f"JUMP {inicio}")
+        self.codigo.append(f"{fim}:")
+
+    def visitar_Funcao(self, no):
+        # funções armazenadas em self.funcoes no gerar
+        # não emitir código diretamente aqui
+        return
+
+    def visitar_ChamadaFuncao(self, no):
+        if no.nome not in self.funcoes:
+            raise Exception(f"Função '{no.nome}' não encontrada para geração")
+
+        func = self.funcoes[no.nome]
+
+        # salvar estado
+        variaveis_antigas = self.variaveis.copy()
+        proximo_antigo = self.proximo_offset
+
+        # alocar parâmetros como variáveis temporárias e armazenar argumentos
+        for parametro, argumento in zip(func.parametros, no.argumentos):
+            self.variaveis[parametro.nome] = self.proximo_offset
+            self.proximo_offset += 1
+            # reservar espaço
+            self.codigo.append("PUSHIMM 0")
+            # calcular argumento e armazenar
+            self.visitar(argumento)
+            self.codigo.append(f"STOREOFF {self.variaveis[parametro.nome]}")
+
+        # inline: executar comandos da função até 'retorne'
+        for comando in func.bloco.comandos:
+            if isinstance(comando, Retorne):
+                # gerar código da expressão de retorno e deixar no topo da pilha
+                self.visitar(comando.valor)
+                break
+            else:
+                self.visitar(comando)
+
+        # restaurar estado (variáveis locais/temporárias ficam alocadas na memória, mas nomes retornam ao estado anterior)
+        self.variaveis = variaveis_antigas
+        self.proximo_offset = proximo_antigo
+
+    def visitar_Retorne(self, no):
+        # em chamadas inline, o retorno é tratado diretamente; fora disso, gerar expressão
+        self.visitar(no.valor)

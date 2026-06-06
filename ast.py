@@ -4,9 +4,10 @@ class Programa:
 
 
 class Declaracao:
-    def __init__(self, tipo, nome):
+    def __init__(self, tipo, nome, tamanho=None):
         self.tipo = tipo
         self.nome = nome
+        self.tamanho = tamanho
 
 
 class Atribuicao:
@@ -60,17 +61,23 @@ class Relacional:
 class Booleano:
     def __init__(self, valor):
         self.valor = valor
-
+ 
 class StringLiteral:
     def __init__(self, valor):
         self.valor = valor
-
-
+ 
+ 
 class CaractereLiteral:
     def __init__(self, valor):
         self.valor = valor
-
-
+ 
+ 
+class AcessoVetor:
+    def __init__(self, nome, indice):
+        self.nome = nome
+        self.indice = indice
+ 
+ 
 class Funcao:
     def __init__(
         self,
@@ -94,9 +101,15 @@ class Parametro:
 class Retorne:
     def __init__(self, valor):
         self.valor = valor
-
-
+ 
+ 
 class ChamadaFuncao:
     def __init__(self, nome, argumentos):
         self.nome = nome
         self.argumentos = argumentos
+
+
+class DoEnquanto:
+    def __init__(self, bloco, condicao):
+        self.bloco = bloco
+        self.condicao = condicao

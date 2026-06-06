@@ -11,7 +11,8 @@ TOKENS = [
     ("SE", r"\bse\b"),
     ("SENAO", r"\bsenao\b"),
     ("ENQUANTO", r"\benquanto\b"),
-
+    ("FACA", r"\bfaca\b"),
+ 
     ("FUNCAO", r"\bfuncao\b"),
     ("RETORNE", r"\bretorne\b"),
 
@@ -46,9 +47,12 @@ TOKENS = [
 
     ("ABRE_PAR", r"\("),
     ("FECHA_PAR", r"\)"),
-
+ 
     ("ABRE_CHAVE", r"\{"),
     ("FECHA_CHAVE", r"\}"),
+ 
+    ("ABRE_COL", r"\["),
+    ("FECHA_COL", r"\]"),
 
     ("VIRGULA", r","),
     ("PONTO_VIRGULA", r";"),

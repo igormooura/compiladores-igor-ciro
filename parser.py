@@ -53,48 +53,70 @@ class Parser:
             "TEXTO"
         ]:
             return self.declaracao()
-
+ 
         if token.tipo == "FUNCAO":
             return self.funcao()
-
+ 
         if token.tipo == "RETORNE":
             return self.retorne()
-
+ 
         if token.tipo == "ID":
             return self.atribuicao()
-
+ 
         if token.tipo == "SE":
             return self.se()
-
+ 
         if token.tipo == "ENQUANTO":
             return self.enquanto()
+ 
+        if token.tipo == "FACA":
+            return self.faca()
 
         raise Exception(
             f"Comando inválido: {token.tipo}"
         )
 
     def declaracao(self):
-
+ 
         tipo = self.atual().valor
         self.pos += 1
-
+ 
         nome = self.consumir("ID").valor
-
+ 
+        # vetor opcional
+        tamanho = None
+        if self.atual() is not None and self.atual().tipo == "ABRE_COL":
+            self.consumir("ABRE_COL")
+            if self.atual().tipo != "NUMERO":
+                raise Exception("Tamanho do vetor deve ser número")
+            tamanho = int(self.atual().valor)
+            self.pos += 1
+            self.consumir("FECHA_COL")
+ 
         self.consumir("PONTO_VIRGULA")
-
-        return Declaracao(tipo, nome)
+ 
+        return Declaracao(tipo, nome, tamanho)
 
     def atribuicao(self):
-
-        nome = self.consumir("ID").valor
-
+ 
+        # suporte para atribuicao em vetor: id[expr] = expr;
+        nome_token = self.consumir("ID")
+        nome = nome_token.valor
+ 
+        destino = nome
+        if self.atual() is not None and self.atual().tipo == "ABRE_COL":
+            self.consumir("ABRE_COL")
+            indice = self.expressao_logica()
+            self.consumir("FECHA_COL")
+            destino = AcessoVetor(nome, indice)
+ 
         self.consumir("ATRIBUI")
-
+ 
         valor = self.expressao_logica()
-
+ 
         self.consumir("PONTO_VIRGULA")
-
-        return Atribuicao(nome, valor)
+ 
+        return Atribuicao(destino, valor)
 
     def se(self):
 
@@ -191,15 +213,32 @@ class Parser:
         )
 
     def retorne(self):
-
+ 
         self.consumir("RETORNE")
-
+ 
         valor = self.expressao_logica()
-
+ 
         self.consumir("PONTO_VIRGULA")
-
+ 
         return Retorne(valor)
-
+ 
+    def faca(self):
+ 
+        self.consumir("FACA")
+ 
+        bloco = self.bloco()
+ 
+        self.consumir("ENQUANTO")
+ 
+        self.consumir("ABRE_PAR")
+ 
+        condicao = self.expressao_logica()
+ 
+        self.consumir("FECHA_PAR")
+ 
+        self.consumir("PONTO_VIRGULA")
+ 
+        return DoEnquanto(bloco, condicao)
     def bloco(self):
 
         self.consumir("ABRE_CHAVE")
@@ -354,59 +393,72 @@ class Parser:
         )
 
     def fator(self):
-
+ 
         token = self.atual()
-
+ 
         if token.tipo == "NUMERO":
             self.pos += 1
             return Numero(token.valor)
-
+ 
         if token.tipo == "STRING_LITERAL":
             self.pos += 1
             return StringLiteral(token.valor)
-
+ 
         if token.tipo == "CARACTERE_LITERAL":
             self.pos += 1
             return CaractereLiteral(token.valor)
-
+ 
         if token.tipo == "VERDADEIRO":
             self.pos += 1
             return Booleano(True)
-
+ 
         if token.tipo == "FALSO":
             self.pos += 1
             return Booleano(False)
-
+ 
         if token.tipo == "NAO":
-
+ 
             self.consumir("NAO")
-
+ 
             return Negacao(
                 self.fator()
             )
-
+ 
         if token.tipo == "ID":
-
+ 
+            # chamada de funcao
             if (
                 self.pos + 1 < len(self.tokens)
                 and self.tokens[self.pos + 1].tipo == "ABRE_PAR"
             ):
                 return self.chamada_funcao()
-
+ 
+            # acesso a vetor: id[expr]
+            if (
+                self.pos + 1 < len(self.tokens)
+                and self.tokens[self.pos + 1].tipo == "ABRE_COL"
+            ):
+                nome = token.valor
+                self.pos += 1
+                self.consumir("ABRE_COL")
+                indice = self.expressao_logica()
+                self.consumir("FECHA_COL")
+                return AcessoVetor(nome, indice)
+ 
             self.pos += 1
-
+ 
             return Variavel(token.valor)
-
+ 
         if token.tipo == "ABRE_PAR":
-
+ 
             self.consumir("ABRE_PAR")
-
+ 
             expr = self.expressao_logica()
-
+ 
             self.consumir("FECHA_PAR")
-
+ 
             return expr
-
+ 
         raise Exception(
             f"Fator inválido: {token.tipo}"
         )

@@ -31,26 +31,39 @@ class AnalisadorSemantico:
 
 
     def visitar_Declaracao(self, no):
-
+ 
         if no.nome in self.tabela:
             raise Exception(
                 f"Variável '{no.nome}' já declarada"
             )
-
-        self.tabela[no.nome] = no.tipo
+ 
+        if no.tamanho is None:
+            self.tabela[no.nome] = no.tipo
+        else:
+            # vetor: armazenar como ('vetor', tipo, tamanho)
+            self.tabela[no.nome] = ('vetor', no.tipo, no.tamanho)
 
 
     def visitar_Atribuicao(self, no):
-
-        if no.nome not in self.tabela:
-            raise Exception(
-                f"Variável '{no.nome}' não declarada"
-            )
-
-        tipo_variavel = self.tabela[no.nome]
-
+ 
+        # destino pode ser nome ou AcessoVetor
+        if isinstance(no.nome, AcessoVetor):
+            # verifica vetor
+            if no.nome.nome not in self.tabela:
+                raise Exception(f"Variável '{no.nome.nome}' não declarada")
+            info = self.tabela[no.nome.nome]
+            if not isinstance(info, tuple) or info[0] != 'vetor':
+                raise Exception(f"'{no.nome.nome}' não é um vetor")
+            tipo_variavel = info[1]
+        else:
+            if no.nome not in self.tabela:
+                raise Exception(
+                    f"Variável '{no.nome}' não declarada"
+                )
+            tipo_variavel = self.tabela[no.nome]
+ 
         tipo_valor = self.visitar(no.valor)
-
+ 
         if tipo_variavel != tipo_valor:
             raise Exception(
                 f"Não é possível atribuir {tipo_valor} em {tipo_variavel}"
@@ -58,13 +71,17 @@ class AnalisadorSemantico:
 
 
     def visitar_Variavel(self, no):
-
+ 
         if no.nome not in self.tabela:
             raise Exception(
                 f"Variável '{no.nome}' não declarada"
             )
-
-        return self.tabela[no.nome]
+ 
+        info = self.tabela[no.nome]
+        if isinstance(info, tuple) and info[0] == 'vetor':
+            raise Exception(f"Uso do vetor '{no.nome}' sem índice")
+ 
+        return info
 
 
     def visitar_Numero(self, no):
@@ -248,3 +265,29 @@ class AnalisadorSemantico:
                 )
 
         return funcao.tipo_retorno
+
+    def visitar_AcessoVetor(self, no):
+
+        if no.nome not in self.tabela:
+            raise Exception(f"Vetor '{no.nome}' não declarado")
+
+        info = self.tabela[no.nome]
+
+        if not isinstance(info, tuple) or info[0] != 'vetor':
+            raise Exception(f"'{no.nome}' não é um vetor")
+
+        tipo_indice = self.visitar(no.indice)
+
+        if tipo_indice != 'inteiro':
+            raise Exception('Índice de vetor deve ser inteiro')
+
+        return info[1]
+
+    def visitar_DoEnquanto(self, no):
+
+        tipo = self.visitar(no.condicao)
+
+        if tipo != 'booleano':
+            raise Exception('Condição do faça-enquanto deve ser booleana')
+
+        self.visitar(no.bloco)

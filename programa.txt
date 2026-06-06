@@ -1,13 +1,17 @@
-inteiro idade;
+inteiro v[3];
+inteiro i;
 
-idade = 10 + 20;
+v[0] = 10;
+v[1] = 20;
+v[2] = 30;
 
-se (idade > 15) {
-    idade = idade + 1;
-} senao { 
-    idade = idade - 2;
+faca {
+    i = i + 1;
+} enquanto (i < 2);
+
+funcao inteiro soma(inteiro a, inteiro b) {
+    retorne a + b;
 }
 
-enquanto (idade < 25) {
-    idade = idade + 1;
-}
+inteiro resultado;
+resultado = soma(v[0], v[1]);
