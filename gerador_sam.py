@@ -170,10 +170,10 @@ class GeradorSaM:
         self.visitar(no.direita)
 
         if no.operador == ">":
-            self.codigo.append("LESS")
+            self.codigo.append("GREATER")
  
         elif no.operador == "<":
-            self.codigo.append("GREATER")
+            self.codigo.append("LESS")
  
         elif no.operador == "==":
             self.codigo.append("EQUAL")
@@ -183,11 +183,11 @@ class GeradorSaM:
             self.codigo.append("NOT")
  
         elif no.operador == ">=":
-            self.codigo.append("GREATER")
+            self.codigo.append("LESS")
             self.codigo.append("NOT")
  
         elif no.operador == "<=":
-            self.codigo.append("LESS")
+            self.codigo.append("GREATER")
             self.codigo.append("NOT")
 
 
