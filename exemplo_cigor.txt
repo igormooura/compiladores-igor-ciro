@@ -1,0 +1,39 @@
+In arr[4].
+In x.
+In y.
+Bol b.
+
+arr[0] => 1.
+arr[1] => 2.
+arr[2] => 3.
+arr[3] => 4.
+
+CRIAR In soma(In a1, In b1) {
+    VOLTA a1 + b1.
+}
+
+x => soma(arr[0], arr[1]).
+
+?? (x ?>= 3) {
+    x => x + 1.
+}
+!! {
+    x => x - 1.
+}
+
+Enq (x ?< 10) {
+    x => x + 1.
+}
+
+!-> {
+    x => x - 1.
+} Enq (x ?> 5).
+
+?? (arr[2] ?!= arr[3]) {
+    y => y + 2.
+}
+!! {
+    y => y + 0.
+}
+
+b => (x ?= 6) ?e :D.

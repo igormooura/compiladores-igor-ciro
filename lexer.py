@@ -1,64 +1,68 @@
 import re
 
 TOKENS = [
-
-    ("INTEIRO", r"\binteiro\b"),
-    ("RACIONAL", r"\bracional\b"),
-    ("LETRA", r"\bletra\b"),
-    ("BOOLEANO", r"\bbooleano\b"),
-    ("TEXTO", r"\btexto\b"),
-
-    ("SE", r"\bse\b"),
-    ("SENAO", r"\bsenao\b"),
-    ("ENQUANTO", r"\benquanto\b"),
-    ("FACA", r"\bfaca\b"),
- 
-    ("FUNCAO", r"\bfuncao\b"),
-    ("RETORNE", r"\bretorne\b"),
-
-    ("VERDADEIRO", r"\bverdadeiro\b"),
-    ("FALSO", r"\bfalso\b"),
-
+    # Tipos de Dados e Palavras-chave
+    ("INTEIRO", r"\bIn\b"),
+    ("RACIONAL", r"\bRac\b"),
+    ("LETRA", r"\bCh\b"),
+    ("BOOLEANO", r"\bBol\b"),
+    ("TEXTO", r"\bTxt\b"),
+    
+    ("SE", r"\?\?"),
+    ("SENAO", r"\!\!"),
+    ("ENQUANTO", r"\bEnq\b"),
+    ("FACA", r"\!\->"),
+    
+    ("FUNCAO", r"\bCRIAR\b"),
+    ("RETORNE", r"\bVOLTA\b"),
+    
+    ("VERDADEIRO", r":D"),
+    ("FALSO", r":C"),
+    
+    # Operadores Compostos (devem vir antes dos simples)
+    ("DIFERENTE", r"\?\!="),
+    ("MAIOR_IGUAL", r"\?>="),
+    ("MENOR_IGUAL", r"\?<="),
+    ("IGUAL", r"\?="),
+    
+    # Operadores Lógicos
+    ("E", r"\?e\b"),
+    ("OU", r"\?ou\b"),
+    ("NAO", r"\?not\b"),
+    
+    # Operadores Relacionais
+    ("MAIOR", r"\?>"),
+    ("MENOR", r"\?<"),
+    
+    # Atribuição
+    ("ATRIBUI", r"=>"),
+    
+    # Literais e Identificadores
     ("STRING_LITERAL", r'"[^"]*"'),
     ("CARACTERE_LITERAL", r"'[^']'"),
     ("NUMERO", r"\d+(\.\d+)?"),
-
     ("ID", r"[a-zA-Z_][a-zA-Z0-9_]*"),
-
-    ("IGUAL", r"=="),
-    ("DIFERENTE", r"!="),
-    ("MAIOR_IGUAL", r">="),
-    ("MENOR_IGUAL", r"<="),
-
-    ("E", r"&&"),
-    ("OU", r"\|\|"),
-    ("NAO", r"!"),
-
-    ("MAIOR", r">"),
-    ("MENOR", r"<"),
-
-    ("ATRIBUI", r"="),
-
+    
+    # Operadores Aritméticos
     ("SOMA", r"\+"),
     ("SUBTRAI", r"-"),
     ("MULTIPLICA", r"\*"),
     ("DIVIDE", r"/"),
     ("RESTO", r"%"),
-
+    
+    # Delimitadores
     ("ABRE_PAR", r"\("),
     ("FECHA_PAR", r"\)"),
- 
     ("ABRE_CHAVE", r"\{"),
     ("FECHA_CHAVE", r"\}"),
- 
     ("ABRE_COL", r"\["),
     ("FECHA_COL", r"\]"),
-
+    
     ("VIRGULA", r","),
-    ("PONTO_VIRGULA", r";"),
-
-    ("COMENTARIO", r"//.*"),
-
+    ("PONTO_VIRGULA", r"\."),
+    
+    ("COMENTARIO", r":3.*"),
+    
     ("IGNORAR", r"[ \t\n]+"),
 ]
 
