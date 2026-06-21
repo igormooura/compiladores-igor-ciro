@@ -99,7 +99,6 @@ class Parser:
 
     def atribuicao(self):
  
-        # suporte para atribuicao em vetor: id[expr] = expr;
         nome_token = self.consumir("ID")
         nome = nome_token.valor
  
