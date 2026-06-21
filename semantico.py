@@ -40,15 +40,13 @@ class AnalisadorSemantico:
         if no.tamanho is None:
             self.tabela[no.nome] = no.tipo
         else:
-            # vetor: armazenar como ('vetor', tipo, tamanho)
+            # ('vetor', tipo, tamanho)
             self.tabela[no.nome] = ('vetor', no.tipo, no.tamanho)
 
 
     def visitar_Atribuicao(self, no):
  
-        # destino pode ser nome ou AcessoVetor
         if isinstance(no.nome, AcessoVetor):
-            # verifica vetor
             if no.nome.nome not in self.tabela:
                 raise Exception(f"Variável '{no.nome.nome}' não declarada")
             info = self.tabela[no.nome.nome]

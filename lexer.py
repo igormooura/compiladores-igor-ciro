@@ -1,7 +1,6 @@
 import re
 
 TOKENS = [
-    # Tipos de Dados e Palavras-chave
     ("INTEIRO", r"\bIn\b"),
     ("RACIONAL", r"\bRac\b"),
     ("LETRA", r"\bCh\b"),
@@ -19,38 +18,31 @@ TOKENS = [
     ("VERDADEIRO", r":D"),
     ("FALSO", r":C"),
     
-    # Operadores Compostos (devem vir antes dos simples)
     ("DIFERENTE", r"\?\!="),
     ("MAIOR_IGUAL", r"\?>="),
     ("MENOR_IGUAL", r"\?<="),
     ("IGUAL", r"\?="),
     
-    # Operadores Lógicos
     ("E", r"\?e\b"),
     ("OU", r"\?ou\b"),
     ("NAO", r"\?not\b"),
     
-    # Operadores Relacionais
     ("MAIOR", r"\?>"),
     ("MENOR", r"\?<"),
     
-    # Atribuição
     ("ATRIBUI", r"=>"),
     
-    # Literais e Identificadores
     ("STRING_LITERAL", r'"[^"]*"'),
     ("CARACTERE_LITERAL", r"'[^']'"),
     ("NUMERO", r"\d+(\.\d+)?"),
     ("ID", r"[a-zA-Z_][a-zA-Z0-9_]*"),
     
-    # Operadores Aritméticos
     ("SOMA", r"\+"),
     ("SUBTRAI", r"-"),
     ("MULTIPLICA", r"\*"),
     ("DIVIDE", r"/"),
     ("RESTO", r"%"),
     
-    # Delimitadores
     ("ABRE_PAR", r"\("),
     ("FECHA_PAR", r"\)"),
     ("ABRE_CHAVE", r"\{"),
