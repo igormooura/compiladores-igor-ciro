@@ -125,3 +125,10 @@ class DoEnquanto:
     def __init__(self, bloco, condicao):
         self.bloco = bloco
         self.condicao = condicao
+
+
+class DeclaracaoConstante:
+    def __init__(self, tipo, nome, valor):
+        self.tipo = tipo
+        self.nome = nome
+        self.valor = valor

@@ -1,0 +1,2 @@
+In x.
+x => :D. :3 Semantic error: cannot assign boolean (Bol) to integer (In)

@@ -6,6 +6,7 @@ TOKENS = [
     ("LETRA", r"\bCh\b"),
     ("BOOLEANO", r"\bBol\b"),
     ("TEXTO", r"\bTxt\b"),
+    ("CONST", r"\bconst\b"),
     
     ("SE", r"\?\?"),
     ("SENAO", r"\!\!"),
@@ -51,7 +52,7 @@ TOKENS = [
     ("FECHA_COL", r"\]"),
     
     ("VIRGULA", r","),
-    ("PONTO_VIRGULA", r"\."),
+    ("PONTO", r"\."),
     
     ("COMENTARIO", r":3.*"),
     

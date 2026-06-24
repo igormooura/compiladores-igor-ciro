@@ -1,0 +1,7 @@
+const In x => 5.
+const Rac y => 3.14.
+
+In z.
+z => x + 2.
+Rac zz.
+zz => y + 1.1.

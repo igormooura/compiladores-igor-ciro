@@ -1,4 +1,4 @@
-from ast import *
+from cigor_ast import *
 
 
 class Parser:
@@ -54,6 +54,9 @@ class Parser:
         ]:
             return self.declaracao()
  
+        if token.tipo == "CONST":
+            return self.declaracao_constante()
+
         if token.tipo == "FUNCAO":
             return self.funcao()
  
@@ -76,6 +79,21 @@ class Parser:
             f"Comando inválido: {token.tipo}"
         )
 
+    def declaracao_constante(self):
+        self.consumir("CONST")
+        tipo_token = self.atual()
+        if tipo_token.tipo not in ["INTEIRO", "RACIONAL", "LETRA", "BOOLEANO", "TEXTO"]:
+            raise Exception("Tipo esperado após 'const'")
+        tipo = tipo_token.valor
+        self.pos += 1
+
+        nome = self.consumir("ID").valor
+        self.consumir("ATRIBUI")
+        valor = self.expressao_logica()
+        self.consumir("PONTO")
+
+        return DeclaracaoConstante(tipo, nome, valor)
+
     def declaracao(self):
  
         tipo = self.atual().valor
@@ -93,7 +111,7 @@ class Parser:
             self.pos += 1
             self.consumir("FECHA_COL")
  
-        self.consumir("PONTO_VIRGULA")
+        self.consumir("PONTO")
  
         return Declaracao(tipo, nome, tamanho)
 
@@ -113,7 +131,7 @@ class Parser:
  
         valor = self.expressao_logica()
  
-        self.consumir("PONTO_VIRGULA")
+        self.consumir("PONTO")
  
         return Atribuicao(destino, valor)
 
@@ -217,7 +235,7 @@ class Parser:
  
         valor = self.expressao_logica()
  
-        self.consumir("PONTO_VIRGULA")
+        self.consumir("PONTO")
  
         return Retorne(valor)
  
@@ -235,7 +253,7 @@ class Parser:
  
         self.consumir("FECHA_PAR")
  
-        self.consumir("PONTO_VIRGULA")
+        self.consumir("PONTO")
  
         return DoEnquanto(bloco, condicao)
     def bloco(self):
@@ -425,14 +443,12 @@ class Parser:
  
         if token.tipo == "ID":
  
-            # chamada de funcao
             if (
                 self.pos + 1 < len(self.tokens)
                 and self.tokens[self.pos + 1].tipo == "ABRE_PAR"
             ):
                 return self.chamada_funcao()
  
-            # acesso a vetor: id[expr]
             if (
                 self.pos + 1 < len(self.tokens)
                 and self.tokens[self.pos + 1].tipo == "ABRE_COL"

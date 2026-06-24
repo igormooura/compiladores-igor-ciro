@@ -1,0 +1,2 @@
+In x :3 Syntax error: missing dot '.' at the end of declaration
+x => 10.

@@ -284,3 +284,64 @@ condicao => (x ?= 6) ?e :D;
 | Disjuncao logica | `?ou` |
 | Negacao logica | `?not` |
 | Comentario | `:3` |
+
+## Gramática Formal (EBNF)
+
+Abaixo está a especificação formal da sintaxe de CIgor em notação EBNF:
+
+```ebnf
+Programa       ::= Comando*
+
+Comando        ::= Declaracao
+                 | Funcao
+                 | Retorne
+                 | Atribuicao
+                 | Se
+                 | Enquanto
+                 | DoEnquanto
+
+Declaracao     ::= Tipo ID ( "[" NUMERO "]" )? "."
+
+Atribuicao     ::= Destino "=>" ExpressaoLogica "."
+Destino        ::= ID ( "[" ExpressaoLogica "]" )?
+
+Se             ::= "??" "(" ExpressaoLogica ")" Bloco ( "!!" Bloco )?
+
+Enquanto       ::= "Enq" "(" ExpressaoLogica ")" Bloco
+
+DoEnquanto     ::= "!->" Bloco "Enq" "(" ExpressaoLogica ")" "."
+
+Funcao         ::= "CRIAR" Tipo ID "(" Parametros? ")" Bloco
+Parametros     ::= Parametro ( "," Parametro )*
+Parametro      ::= Tipo ID
+
+Retorne        ::= "VOLTA" ExpressaoLogica "."
+
+Bloco          ::= "{" Comando* "}"
+
+ExpressaoLogica ::= ExpressaoRelacional ( OperadorLogico ExpressaoRelacional )*
+OperadorLogico  ::= "?e" | "?ou"
+
+ExpressaoRelacional ::= Expressao ( OperadorRelacional Expressao )?
+OperadorRelacional  ::= "?>" | "?<" | "?>=" | "?<=" | "?=" | "?!="
+
+Expressao      ::= Termo ( ( "+" | "-" ) Termo )*
+
+Termo          ::= Fator ( ( "*" | "/" | "%" ) Fator )*
+
+Fator          ::= NUMERO
+                 | STRING_LITERAL
+                 | CARACTERE_LITERAL
+                 | ":D"
+                 | ":C"
+                 | "?not" Fator
+                 | ID "(" Argumentos? ")"
+                 | ID "[" ExpressaoLogica "]"
+                 | ID
+                 | "(" ExpressaoLogica ")"
+
+Argumentos     ::= ExpressaoLogica ( "," ExpressaoLogica )*
+
+Tipo           ::= "In" | "Rac" | "Ch" | "Bol" | "Txt"
+```
+

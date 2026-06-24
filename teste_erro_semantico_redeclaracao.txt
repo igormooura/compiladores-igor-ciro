@@ -1,0 +1,2 @@
+In x.
+In x. :3 Semantic error: variable x already declared in this scope

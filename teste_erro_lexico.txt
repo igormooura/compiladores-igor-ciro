@@ -1,0 +1,1 @@
+In x; :3 Lexical error: semicolon ';' is invalid in CIgor (should be '.')

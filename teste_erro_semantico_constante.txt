@@ -1,0 +1,2 @@
+const In x => 5.
+x => 10. :3 Semantic error: Cannot modify constant x

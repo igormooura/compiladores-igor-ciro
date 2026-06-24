@@ -1,10 +1,14 @@
+import sys
+import os
 from lexer import analisar_lexicamente
 from parser import Parser
 from semantico import AnalisadorSemantico
 from gerador_sam import GeradorSaM
 
 
-with open("programa.txt", "r", encoding="utf8") as arquivo:
+caminho_arquivo = sys.argv[1] if len(sys.argv) > 1 else "programa.txt"
+
+with open(caminho_arquivo, "r", encoding="utf8") as arquivo:
     codigo = arquivo.read()
 
 
@@ -38,12 +42,13 @@ print("\n=== CÓDIGO SaM ===")
 print(codigo_sam)
 
 
+caminho_sam = os.path.splitext(caminho_arquivo)[0] + ".sam"
 with open(
-    "programa.sam",
+    caminho_sam,
     "w",
     encoding="utf8"
 ) as arquivo:
 
     arquivo.write(codigo_sam)
 
-print("\nArquivo programa.sam gerado")
+print(f"\nArquivo {caminho_sam} gerado")
