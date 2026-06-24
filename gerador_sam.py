@@ -216,6 +216,18 @@ class GeradorSaM:
         self.visitar(no.expressao)
         self.codigo.append("NOT")
 
+    def visitar_Negativo(self, no):
+        if no.tipo_inferred == "racional":
+            self.codigo.append("PUSHIMMF 0.0")
+            self.visitar(no.expressao)
+            if no.expressao.tipo_inferred == "inteiro":
+                self.codigo.append("ITOF")
+            self.codigo.append("SUBF")
+        else:
+            self.codigo.append("PUSHIMM 0")
+            self.visitar(no.expressao)
+            self.codigo.append("SUB")
+
     def visitar_Se(self, no):
         rotulo_senao = self.novo_rotulo()
         rotulo_fim = self.novo_rotulo()

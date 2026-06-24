@@ -121,6 +121,11 @@ class Negacao:
         self.expressao = expressao
 
 
+class Negativo:
+    def __init__(self, expressao):
+        self.expressao = expressao
+
+
 class DoEnquanto:
     def __init__(self, bloco, condicao):
         self.bloco = bloco

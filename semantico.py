@@ -201,6 +201,14 @@ class AnalisadorSemantico:
             )
         return "booleano"
 
+    def visitar_Negativo(self, no):
+        tipo = self.visitar(no.expressao)
+        if tipo not in ["inteiro", "racional"]:
+            raise Exception(
+                "Sinal negativo requer valor numérico"
+            )
+        return tipo
+
     def visitar_Bloco(self, no):
         for comando in no.comandos:
             self.visitar(comando)

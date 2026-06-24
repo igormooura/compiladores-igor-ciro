@@ -8,6 +8,7 @@ from gerador_sam import GeradorSaM
 TESTS = [
     ("teste_sucesso_1.txt", "SUCESSO"),
     ("teste_sucesso_2.txt", "SUCESSO"),
+    ("teste_sucesso_negativos.txt", "SUCESSO"),
     ("teste_sucesso_constante.txt", "SUCESSO"),
     ("exemplo_cigor.txt", "SUCESSO"),
     ("teste_erro_lexico.txt", "ERRO LÉXICO"),

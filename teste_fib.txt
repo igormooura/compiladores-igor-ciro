@@ -1,0 +1,31 @@
+
+
+In resultado1.
+In resultado2.
+In resultado3.
+CRIAR In fib(In n) {
+    In a.
+    In b.
+    In i.
+    In temp.
+
+    a => 0.
+    b => 1.
+    i => 0.
+
+    Enq (i ?< n) {
+        temp => a + b.
+        a => b.
+        b => temp.
+        i => i + 1.
+    }
+
+    VOLTA a.
+}
+?? (:D ?e :D){
+    resultado1 => 1110.
+}
+resultado2 => fib(6).
+resultado3 => fib(7).
+
+

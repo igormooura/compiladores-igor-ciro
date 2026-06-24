@@ -412,6 +412,12 @@ class Parser:
     def fator(self):
  
         token = self.atual()
+
+        if token.tipo == "SUBTRAI":
+            self.consumir("SUBTRAI")
+            return Negativo(
+                self.fator()
+            )
  
         if token.tipo == "NUMERO":
             self.pos += 1
